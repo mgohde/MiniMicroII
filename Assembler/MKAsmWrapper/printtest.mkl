@@ -1,0 +1,114 @@
+const curX 0
+const curY 0
+const val1 1
+const val2 9
+string str "*"
+string str1 "="
+
+>main
+
+r1 <- #val1
+r2 = r1
+call #printnum
+r1 <- #str
+call #printchar
+r1 <- #val2
+r3 = r1
+call #printnum
+r1 <- #str1
+call #printchar
+
+r1 = r2
+r2 = r3
+
+call #mul
+
+r1 = r3
+call #printnum
+
+hlt
+
+; multiplies r1 by r2 and stores the result in r3
+>mul
+
+push r4
+r4 = r4 ^ r4
+r3 = r3 ^ r3
+
+for r3 to r2
+	r4 = r4 + r1
+endfor
+
+r3 = r4
+pop r4
+
+ret
+
+; prints the number in r1
+>printnum
+push r1
+push r2
+push r3
+push r4
+
+r3 = r1
+
+r1 <- #curX
+r2 <- #curY
+; 48 is 0 in ascii
+r4 = 48
+r3 = r3 + r4
+call #plotchar
+
+r3 = 1
+r1 = r1 + r3
+r1 -> #curX
+
+r3 = 80
+
+gotoequal r3 r1 #overflowhandler
+
+>endfunc
+pop r4
+pop r3
+pop r2
+pop r1
+ret
+
+>overflowhandler
+r3 = 1
+r2 = r2 + r3
+r1 = 0
+r1 -> #curX
+r2 -> #curY
+goto #endfunc
+
+; same thing as printnum, but not numbery.
+; Prints the character in r1
+>printchar
+push r1
+push r2
+push r3
+
+r3 = r1
+
+r1 <- #curX
+r2 <- #curY
+call #plotchar
+
+r3 = 1
+r1 = r1 + r3
+r2 = r2 + r3
+r1 -> #curX
+r2 -> #curY
+
+pop r3
+pop r2
+pop r1
+ret
+
+>plotchar
+r1 -> 8000
+r2 -> 8001
+r3 -> 8002
+ret
