@@ -1,0 +1,742 @@
+$date
+	Fri Nov 13 07:49:37 2015
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module dispatchu_tb $end
+$var wire 3 ! aSel [2:0] $end
+$var wire 32 " addr [31:0] $end
+$var wire 3 # bSel [2:0] $end
+$var wire 16 $ cOut [15:0] $end
+$var wire 3 % cSel [2:0] $end
+$var wire 1 & cWrite $end
+$var wire 3 ' intA [2:0] $end
+$var wire 3 ( intB [2:0] $end
+$var wire 3 ) intC [2:0] $end
+$var wire 4 * intOp [3:0] $end
+$var wire 16 + memDat [15:0] $end
+$var wire 16 , memOut [15:0] $end
+$var wire 1 - memWrite $end
+$var reg 16 . aDat [15:0] $end
+$var reg 16 / bDat [15:0] $end
+$var reg 16 0 cDat [15:0] $end
+$var reg 1 1 clk $end
+$var reg 4 2 memSel [3:0] $end
+$scope module du $end
+$var wire 32 3 ABBus [31:0] $end
+$var wire 16 4 ADAT [15:0] $end
+$var wire 3 5 Asel [2:0] $end
+$var wire 16 6 BDAT [15:0] $end
+$var wire 3 7 Bsel [2:0] $end
+$var wire 16 8 CDAT [15:0] $end
+$var wire 1 9 CLK $end
+$var wire 16 : Cout [15:0] $end
+$var wire 3 ; Csel [2:0] $end
+$var wire 16 < MEMDAT [15:0] $end
+$var wire 32 = PCBus [31:0] $end
+$var wire 3 > a [2:0] $end
+$var wire 32 ? addr [31:0] $end
+$var wire 3 @ b [2:0] $end
+$var wire 1 A branch $end
+$var wire 3 B c [2:0] $end
+$var wire 1 & cWrite $end
+$var wire 1 C cmp $end
+$var wire 32 D extendedMemoryInputBus [31:0] $end
+$var wire 1 E fetchNextOp $end
+$var wire 1 F greater $end
+$var wire 1 G intOp $end
+$var wire 3 H intPipeA [2:0] $end
+$var wire 3 I intPipeB [2:0] $end
+$var wire 3 J intPipeC [2:0] $end
+$var wire 4 K intPipeOp [3:0] $end
+$var wire 1 L ldl $end
+$var wire 1 M less $end
+$var wire 1 N load $end
+$var wire 16 O memOut [15:0] $end
+$var wire 1 - memWrite $end
+$var wire 7 P op [6:0] $end
+$var wire 1 Q pcDec $end
+$var wire 1 R pcInc $end
+$var wire 1 S same $end
+$var wire 1 T stack $end
+$var wire 32 U stkPtrBus [31:0] $end
+$var wire 1 V store $end
+$var reg 2 W addrMuxSelector [1:0] $end
+$var reg 2 X cSelector [1:0] $end
+$var reg 1 Y cWriteReg $end
+$var reg 16 Z curVals [15:0] $end
+$var reg 1 [ gFlag $end
+$var reg 1 \ lFlag $end
+$var reg 16 ] memOutReg [15:0] $end
+$var reg 1 ^ memWriteReg $end
+$var reg 1 _ pcInputSel $end
+$var reg 1 ` pcWrite $end
+$var reg 1 a sFlag $end
+$var reg 1 b stateReg $end
+$var reg 1 c stkpDec $end
+$var reg 1 d stkpInc $end
+$var reg 1 e stkpWrite $end
+$scope module stackPointer $end
+$var wire 1 9 CLK $end
+$var wire 1 f DECREMENT $end
+$var wire 1 g INCREMENT $end
+$var wire 32 h NEWV [31:0] $end
+$var wire 1 i WRITE $end
+$var wire 32 j out [31:0] $end
+$var reg 32 k val [31:0] $end
+$upscope $end
+$scope module programCounter $end
+$var wire 1 9 CLK $end
+$var wire 1 Q DECREMENT $end
+$var wire 1 R INCREMENT $end
+$var wire 32 l NEWV [31:0] $end
+$var wire 1 m WRITE $end
+$var wire 32 n out [31:0] $end
+$var reg 32 o val [31:0] $end
+$upscope $end
+$scope module ot $end
+$var wire 7 p OP [6:0] $end
+$var wire 1 A branch $end
+$var wire 1 C cmp $end
+$var wire 1 L ldl $end
+$var wire 1 N load $end
+$var wire 1 T stack $end
+$var wire 1 V store $end
+$upscope $end
+$scope module comp $end
+$var wire 16 q A [15:0] $end
+$var wire 16 r B [15:0] $end
+$var wire 1 F greater $end
+$var wire 1 M less $end
+$var wire 1 S same $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+b0 r
+b0 q
+b0 p
+b0 o
+b0 n
+0m
+bx l
+b0 k
+b0 j
+xi
+b0 h
+xg
+xf
+xe
+xd
+xc
+0b
+xa
+0`
+x_
+0^
+b0 ]
+x\
+x[
+b0 Z
+0Y
+b0 X
+b0 W
+0V
+b0 U
+0T
+1S
+1R
+0Q
+b0 P
+b0 O
+0N
+0M
+0L
+b0 K
+b0 J
+b0 I
+b0 H
+1G
+0F
+1E
+b1010 D
+0C
+b0 B
+0A
+b0 @
+b0 ?
+b0 >
+b0 =
+b1010 <
+b0 ;
+b1010 :
+09
+b0 8
+b0 7
+b0 6
+b0 5
+b0 4
+b0 3
+b0 2
+01
+b0 0
+b0 /
+b0 .
+0-
+b0 ,
+b1010 +
+b0 *
+b0 )
+b0 (
+b0 '
+0&
+b0 %
+b1010 $
+b0 #
+b0 "
+b0 !
+$end
+#1
+b1 @
+b1 (
+b1 I
+b1 #
+b1 7
+b10 B
+b10 )
+b10 J
+b10 %
+b10 ;
+0_
+b0 l
+0e
+0i
+b1010 Z
+11
+19
+#2
+b1 o
+b1 =
+b1 n
+b1 "
+b1 ?
+01
+09
+#3
+11
+19
+#4
+b10 o
+b10 =
+b10 n
+b10 "
+b10 ?
+b1 2
+b1000000000000111 +
+b1000000000000111 <
+b1000000000000111 D
+b1000000000000111 $
+b1000000000000111 :
+01
+09
+#5
+0R
+0E
+0G
+1L
+b1000000 P
+b1000000 p
+b0 @
+b0 (
+b0 I
+b0 #
+b0 7
+b111 B
+b111 )
+b111 J
+b111 %
+b111 ;
+b1000000000000111 Z
+11
+19
+#6
+b10 2
+b110011000111000 +
+b110011000111000 <
+b110011000111000 D
+b110011000111000 $
+b110011000111000 :
+01
+09
+#7
+1R
+1E
+1G
+0L
+b0 P
+b0 p
+b0 B
+b0 )
+b0 J
+b0 %
+b0 ;
+1Y
+1&
+b1 X
+b0 $
+b0 :
+b0 Z
+11
+19
+#8
+b11 o
+b11 =
+b11 n
+b11 "
+b11 ?
+01
+09
+#9
+0R
+0E
+0G
+b0 *
+b0 K
+1A
+b110011 P
+b110011 p
+b111 @
+b111 (
+b111 I
+b111 #
+b111 7
+b110011000111000 $
+b110011000111000 :
+0Y
+0&
+b110011000111000 Z
+11
+19
+#10
+b11 2
+bx +
+bx <
+b0xxxxxxxxxxxxxxxx D
+01
+09
+#11
+1R
+1E
+1G
+0A
+b0 P
+b0 p
+b0 @
+b0 (
+b0 I
+b0 #
+b0 7
+b0 $
+b0 :
+b0 Z
+1`
+1m
+11
+19
+#12
+b0 o
+b0 =
+b0 n
+b0 "
+b0 ?
+01
+09
+#13
+xR
+xE
+xG
+bx *
+bx K
+xL
+xT
+xA
+xN
+xV
+xC
+bx P
+bx p
+bx >
+bx '
+bx H
+bx !
+bx 5
+bx @
+bx (
+bx I
+bx #
+bx 7
+bx B
+bx )
+bx J
+bx %
+bx ;
+b0xxxxxxxxxxxxxxx $
+b0xxxxxxxxxxxxxxx :
+bx Z
+11
+19
+#14
+b0 2
+b1010 +
+b1010 <
+b1010 D
+01
+09
+#15
+11
+19
+#16
+01
+09
+#17
+11
+19
+#18
+01
+09
+#19
+11
+19
+#20
+01
+09
+#21
+11
+19
+#22
+01
+09
+#23
+11
+19
+#24
+01
+09
+#25
+11
+19
+#26
+01
+09
+#27
+11
+19
+#28
+01
+09
+#29
+11
+19
+#30
+01
+09
+#31
+11
+19
+#32
+01
+09
+#33
+11
+19
+#34
+01
+09
+#35
+11
+19
+#36
+01
+09
+#37
+11
+19
+#38
+01
+09
+#39
+11
+19
+#40
+01
+09
+#41
+11
+19
+#42
+01
+09
+#43
+11
+19
+#44
+01
+09
+#45
+11
+19
+#46
+01
+09
+#47
+11
+19
+#48
+01
+09
+#49
+11
+19
+#50
+01
+09
+#51
+11
+19
+#52
+01
+09
+#53
+11
+19
+#54
+01
+09
+#55
+11
+19
+#56
+01
+09
+#57
+11
+19
+#58
+01
+09
+#59
+11
+19
+#60
+01
+09
+#61
+11
+19
+#62
+01
+09
+#63
+11
+19
+#64
+01
+09
+#65
+11
+19
+#66
+01
+09
+#67
+11
+19
+#68
+01
+09
+#69
+11
+19
+#70
+01
+09
+#71
+11
+19
+#72
+01
+09
+#73
+11
+19
+#74
+01
+09
+#75
+11
+19
+#76
+01
+09
+#77
+11
+19
+#78
+01
+09
+#79
+11
+19
+#80
+01
+09
+#81
+11
+19
+#82
+01
+09
+#83
+11
+19
+#84
+01
+09
+#85
+11
+19
+#86
+01
+09
+#87
+11
+19
+#88
+01
+09
+#89
+11
+19
+#90
+01
+09
+#91
+11
+19
+#92
+01
+09
+#93
+11
+19
+#94
+01
+09
+#95
+11
+19
+#96
+01
+09
+#97
+11
+19
+#98
+01
+09
+#99
+11
+19
+#100
+01
+09
+#101
+11
+19
+#102
+01
+09
+#103
+11
+19
+#104
+01
+09
+#105
+11
+19
+#106
+01
+09
+#107
+11
+19
+#108
+01
+09
+#109
+11
+19
+#110
+01
+09
+#111
+11
+19
+#112
+01
+09
+#113
+11
+19
+#114
+01
+09
+#115
+11
+19
+#116
+01
+09
+#117
+11
+19
+#118
+01
+09
+#119
+11
+19
+#120
+01
+09
+#121
+11
+19
+#122
+01
+09
+#123
+11
+19
+#124
+01
+09
+#125
+11
+19
+#126
+01
+09
+#127
+11
+19
+#128
+01
+09
