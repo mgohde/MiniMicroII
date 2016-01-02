@@ -61,6 +61,8 @@ wire [1:0] curOffset;
 assign curOffset=programCounter[1:0]; //Or %4, but this is clearer.
 lineBreaker clbr(curOffset, cacheDat, curOp);
 
+reg [15:0] bufferedControlOp;
+
 //Add some wirey decoding for the op:
 //Most instructions are formatted as follows:
 //0000:0000:0000:0000
@@ -69,10 +71,20 @@ wire [6:0] opCode;
 wire [2:0] operA;
 wire [2:0] operB;
 wire [2:0] operC;
-assign operC=curOp[2:0];
-assign operB=curOp[5:3];
-assign operA=curOp[8:6];
-assign opCode=curOp[15:9];
+assign operC=bufferedControlOp[2:0];
+assign operB=bufferedControlOp[5:3];
+assign operA=bufferedControlOp[8:6];
+assign opCode=bufferedControlOp[15:9];
+
+//Add decoding logic for the current, non-buffered instruction:
+wire [6:0] curOpCode;
+wire [2:0] curOperA;
+wire [2:0] curOperB;
+wire [2:0] curOperC;
+assign curOperC=curOp[2:0];
+assign curOperB=curOp[5:3];
+assign curOperA=curOp[8:6];
+assign curOpCode=curOp[15:9];
 
 //LDL instructions are as follows:
 //0000:0000:0000:0000
@@ -88,7 +100,7 @@ assign ABCombined[15:0]=bDat;
 
 //Now set up the logic to determine whether we should dispatch the op to the int pipe:
 wire intPipeOp;
-assign intPipeOp=opCode<11; //NOPs are also included as int ops.
+assign intPipeOp=curOpCode<11; //NOPs are also included as int ops.
 
 //So that pipelines can be forced to do nothing:
 wire [3:0] nullOp;
@@ -151,6 +163,27 @@ assign COUT=cOutputBuffer;
 reg cWrite;
 assign CWRI=cWrite;
 
+reg [15:0] memOutReg;
+assign MEMOUT=memOutReg;
+
+//Mux the C select line so that data will be available faster:
+wire [2:0] csMux[0:1];
+assign csMux[0]=operC;
+assign csMux[1]=3'b111;
+
+assign CS=csMux[ldlBit];
+
+assign CS=csReg;
+assign AS=operA;
+assign BS=operB;
+
+reg [15:0] pcBuffer;
+
+wire [31:0] callPC;
+assign callPC=programCounter+1;
+
+reg halted;
+
 always@(posedge clk or posedge rst) begin
 	if(rst) begin
 		stateCtr<=0;
@@ -161,20 +194,27 @@ always@(posedge clk or posedge rst) begin
 		aluB0<=0;
 		aluC0<=0;
 		P0_wait<=0;
+		halted<=0;
+		cWrite<=0;
+		memWriReg<=0;
 	end
 
 	else if(~allWait) begin //Only work if there are no wait signals.
 		if(stateCtr==0) begin //State 0 is the normal mode of operation.
 			//Determine if the current operation should be scheduled on the int pipe or not:
 			if(intPipeOp) begin
-				//Increment the program counter as always.
-				programCounter<=programCounter+1;	
+				aluA0<=curOperA;
+				aluB0<=curOperB;
+				aluC0<=curOperC;
+				aluOp0<=curOpCode;	
 			end
 
 			//Otherwise start executing whatever control op needs to be executed.
 			else begin
 				stateCtr<=1; //This is constant regardless.
+				bufferedControlOp<=curOp;
 			end
+			programCounter<=programCounter+1;
 		end
 
 		//----------------BEGIN STATE 1--------------------//
@@ -183,6 +223,196 @@ always@(posedge clk or posedge rst) begin
 				cWrite<=1;
 				cOutputBuffer[14:0]<=rawData;
 				cOutputBuffer[15]<=0;
+				stateCtr<=2;
+			end
+
+			//SSR - 28h
+			else if(opCode==40) begin
+				cOutputBuffer<=stackPointer[15:0];
+				cWrite<=1;
+				stateCtr<=2;
+			end
+
+			//LSR - 29h
+			else if(opCode==41) begin
+				stackPointer<=ABCombined;
+				stateCtr<=0;
+			end
+
+			//PUSH - 2Ah
+			else if(opCode==42) begin
+				memOutReg<=aDat;
+				memWriReg<=1;
+				stateCtr<=2;
+			end
+
+			//POP - 2Bh
+			else if(opCode==43) begin
+				stackPointer<=stackPointer+1;
+				stateCtr<=2;
+			end
+		
+			//CALL - 2Ch
+			else if(opCode==44) begin
+				memWriReg<=1;
+				memOutReg<=callPC[15:0];
+				stateCtr<=0;
+			end
+
+			//RET - 2Dh
+			else if(opCode==45) begin
+				stackPointer<=stackPointer+1;
+				stateCtr<=2;
+			end
+
+			//CMP - 32h
+			else if(opCode==50) begin
+				P<=grtr;
+				N<=less;
+				E<=same;
+				stateCtr<=0;
+			end
+
+			//JMP - 33h
+			else if(opCode==51) begin
+				programCounter<=ABCombined;
+				stateCtr<=0;
+			end
+
+			//JE - 34h
+			else if(opCode==52) begin
+				if(E) begin
+					programCounter<=ABCombined;
+				end
+				
+				stateCtr<=0;
+			end
+
+			//JP - 35h
+			else if(opCode==53) begin
+				if(E) begin
+					programCounter<=ABCombined;
+				end
+
+				stateCtr<=0;
+			end
+
+			//JN - 36h
+			else if(opCode==54) begin
+				if(N) begin
+					programCounter<=ABCombined;
+				end
+
+				stateCtr<=0;
+			end
+
+			//HLT - 3Bh
+			else if(opCode==59) begin
+				halted<=1;
+				stateCtr<=1; //Infinite loop.
+			end
+
+			//LOAD - 3Ch
+			else if(opCode==60) begin
+				csReg<=operC;
+				cWrite<=1;
+				cOutputBuffer<=memIn;
+				stateCounter<=0;
+			end
+
+			//STORE - 3Dh
+			else if(opCode==61) begin
+				memOutReg<=cDat;
+				memWriReg<=1;
+			end
+
+			//Insert stubs for LDFLGS and STFLGS here.
+
+		end //---------------- END STATE 1 -----------------------//
+
+		//----------------BEGIN STATE 2--------------------//
+		else if(stateCtr==2) begin
+			if(ldlBit) begin //Easiest to handle:
+				cWrite<=0;
+				stateCtr<=0;
+			end
+
+			//SSR - 28h
+			else if(opCode==40) begin
+				cWrite<=0;
+				stateCtr<=0;
+			end
+
+			//LSR - 29h
+			else if(opCode==41) begin
+			end
+
+			//PUSH - 2Ah
+			else if(opCode==42) begin
+				memWriReg<=0;
+				stackPointer<=stackPointer-1;
+				stateCtr<=0;
+			end
+
+			//POP - 2Bh
+			else if(opCode==43) begin
+				cWrite<=1;
+				cOutputBuffer<=memIn;
+				
+			end
+		
+			//CALL - 2Ch
+			else if(opCode==44) begin
+				memOutReg<=callPC[31:16];
+				stackPointer<=stackPointer-1;
+			end
+
+			//RET - 2Dh
+			else if(opCode==45) begin
+				stackPointer<=stackPointer+1;
+				pcBuffer<=memIn;
+			end
+
+			//CMP - 32h
+			else if(opCode==50) begin
+			end
+
+			//JMP - 33h
+			else if(opCode==51) begin
+			end
+
+			//JE - 34h
+			else if(opCode==52) begin
+			end
+
+			//JP - 35h
+			else if(opCode==53) begin
+			end
+
+			//JN - 36h
+			else if(opCode==54) begin
+			end
+
+			//HLT - 3Bh
+			else if(opCode==59) begin
+			end
+
+			//LOAD - 3Ch
+			else if(opCode==60) begin
+			end
+
+			//STORE - 3Dh
+			else if(opCode==61) begin
+				memWriReg<=0;
+				stateCtr<=0;
+			end
+
+			//Insert stubs for LDFLGS and STFLGS here.
+		end //---------------- END STATE 2 -----------------------//
+
+		//----------------BEGIN STATE 3--------------------//
+		else if(stateCtr==3) begin
+			if(ldlBit) begin //Easiest to handle:
 			end
 
 			//SSR - 28h
@@ -199,14 +429,22 @@ always@(posedge clk or posedge rst) begin
 
 			//POP - 2Bh
 			else if(opCode==43) begin
+				memWrite<=0;
+				stateCtr<=0;
 			end
 		
 			//CALL - 2Ch
 			else if(opCode==44) begin
+				memWriReg<=0;
+				stackPointer<=stackPointer-1;
+				stateCtr<=0;
 			end
 
 			//RET - 2Dh
 			else if(opCode==45) begin
+				programCounter[31:16]<=memIn;
+				stateCtr<=0;
+				programCounter[15:0]<=pcBuffer;
 			end
 
 			//CMP - 32h
@@ -243,8 +481,7 @@ always@(posedge clk or posedge rst) begin
 
 			//Insert stubs for LDFLGS and STFLGS here.
 
-			stateCtr<=2;
-		end
+		end //---------------- END STATE 3 -----------------------//
 	end
 end
 
